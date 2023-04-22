@@ -135,10 +135,24 @@ int main(int argc, char* argv[])
         SDL_Rect res;
         if(SDL_IntersectRect(&leftpaddle, &ball, &res)){
         		ballmoveleft =false;
+        		score++;
+        		ss.str(""); // Clear the stringstream
+       			 ss.clear();
+			    ss << score;
+			    scoreStr = ss.str();
+			    text = TTF_RenderText_Solid( font, scoreStr.c_str(), color );
+			    textTexture = SDL_CreateTextureFromSurface(renderer, text);
         }
 
           if(SDL_IntersectRect(&rightpaddle, &ball, &res)){
         		ballmoveleft =true;
+        		score++;
+        		ss.str(""); // Clear the stringstream
+        		ss.clear();
+			    ss << score;
+			    scoreStr = ss.str();
+			    text = TTF_RenderText_Solid( font, scoreStr.c_str(), color );
+			    textTexture = SDL_CreateTextureFromSurface(renderer, text);
         }
 
 
