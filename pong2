@@ -6,6 +6,40 @@
 
 using namespace std;
 
+void showStartScreen(SDL_Renderer* renderer, TTF_Font* font) {
+    SDL_Color color = {0, 0, 0};
+    SDL_Surface* startTextSurface = TTF_RenderText_Solid(font, "Pong 2: Press SPACE to start", color);
+    SDL_Texture* startTextTexture = SDL_CreateTextureFromSurface(renderer, startTextSurface);
+    int textWidth = startTextSurface->w;
+    int textHeight = startTextSurface->h;
+    SDL_FreeSurface(startTextSurface);
+
+    SDL_Rect textRect = {320 - textWidth / 2, 240 - textHeight / 2, textWidth, textHeight};
+
+    bool startScreen = true;
+    while (startScreen) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                startScreen = false;
+                exit(0);
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_SPACE) {
+                    startScreen = false;
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, startTextTexture, NULL, &textRect);
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_DestroyTexture(startTextTexture);
+}
+
 
 
 int main(int argc, char* argv[])
@@ -91,6 +125,7 @@ int main(int argc, char* argv[])
     int frameTime;
 
     bool quit = false;
+     showStartScreen(renderer, font);
     while (!quit) {
  		frameStart = SDL_GetTicks();
 
