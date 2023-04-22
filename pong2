@@ -1,4 +1,10 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
 
 const int PADDLE_SPEED = 5;
 
@@ -6,14 +12,54 @@ int main(int argc, char* argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
 
+    if ( TTF_Init() < 0 ) {
+	cout << "Error initializing SDL_ttf: " << TTF_GetError() << endl;
+	}
+
+
     SDL_Window* window = SDL_CreateWindow("SDL2 Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
+    TTF_Font* font;
+    int score = 0;
+    stringstream ss;
+    ss << score;
+    string scoreStr = ss.str();
+
+	font = TTF_OpenFont("./Roboto-Bold.ttf", 24);
+	if ( !font ) {
+		cout << "Failed to load font: " << TTF_GetError() << endl;
+	}
+
+	SDL_Surface* text;
+	// Set color to black
+	SDL_Color color = { 0, 0, 0 };
+	
+	text = TTF_RenderText_Solid( font, scoreStr.c_str(), color );
+	if ( !text ) {
+	cout << "Failed to render text: " << TTF_GetError() << endl;
+	}
+
+	 // Create a texture from the text surface
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, text);
+
+    // Get the width and height of the text surface
+    int textWidth = text->w;
+    int textHeight = text->h;
+
+    // Free the text surface as it's no longer needed
+    SDL_FreeSurface(text);
+
+    // Set the position and size of the text on the screen
+    SDL_Rect textRect = { 10, 10, textWidth, textHeight };
+
+
+
     SDL_Rect leftpaddle;
     SDL_Rect rightpaddle;
     SDL_Rect ball;
-
+    
 
 
     leftpaddle.x = 10;
@@ -135,7 +181,7 @@ int main(int argc, char* argv[])
     SDL_RenderFillRect(renderer, &leftpaddle);
     SDL_RenderFillRect(renderer, &rightpaddle);
     SDL_RenderFillRect(renderer, &ball);
-
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
     SDL_RenderPresent(renderer);
 
     frameTime = SDL_GetTicks() - frameStart;
@@ -145,6 +191,7 @@ int main(int argc, char* argv[])
 
 
     }
+    SDL_DestroyTexture(textTexture);
 
     SDL_DestroyWindow(window);
 
