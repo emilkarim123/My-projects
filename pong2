@@ -41,6 +41,41 @@ void showStartScreen(SDL_Renderer* renderer, TTF_Font* font) {
 }
 
 
+void gameOver(SDL_Renderer* renderer, TTF_Font* font) {
+	SDL_Color color = {196, 21, 18};
+    SDL_Surface* gameOverSurface = TTF_RenderText_Solid(font, "WASTED", color);
+    SDL_Texture* gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
+
+    int textWidth = gameOverSurface->w;
+    int textHeight = gameOverSurface->h;
+    SDL_FreeSurface(gameOverSurface);
+
+    SDL_Rect textRect = {320 - textWidth / 2, 240 - textHeight / 2, textWidth, textHeight};
+
+    bool startScreen = true;
+    while (startScreen) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                startScreen = false;
+                exit(0);
+            }
+           
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, gameOverTexture, NULL, &textRect);
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_DestroyTexture(gameOverTexture);
+
+
+
+}
+
+
 
 int main(int argc, char* argv[])
 {
@@ -229,6 +264,9 @@ int main(int argc, char* argv[])
 		            rightpaddle.y += PADDLE_SPEED;
 		        }
 		    }
+
+		    if(ball.x == 5 || ball.x == 625)
+		    	gameOver(renderer, font);
 
 
 
