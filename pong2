@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const int PADDLE_SPEED = 5;
+
 
 int main(int argc, char* argv[])
 {
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	cout << "Error initializing SDL_ttf: " << TTF_GetError() << endl;
 	}
 
-
+	int PADDLE_SPEED = 5;
     SDL_Window* window = SDL_CreateWindow("SDL2 Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
@@ -120,24 +120,30 @@ int main(int argc, char* argv[])
 
 
 
+       
+
         if(ballmoveleft){
-        	if(ball.x == 0){
-        		ballmoveleft = false;
-        	}else ball.x -= PADDLE_SPEED;
-        	
-        } 
-        if(!ballmoveleft){
-        	if(ball.x >= 640 - ball.w){
-        		ballmoveleft = true;
-        	}else ball.x += PADDLE_SPEED;
-        	
-        } 
+	        if(ball.x <= PADDLE_SPEED){
+	            ballmoveleft = false;
+	        }else {
+	            ball.x -= PADDLE_SPEED;
+	        }
+	    } 
+	    if(!ballmoveleft){
+	        if(ball.x >= 640 - ball.w - PADDLE_SPEED){
+	            ballmoveleft = true;
+	        }else {
+	            ball.x += PADDLE_SPEED;
+	        }
+	    }
         SDL_Rect res;
         if(SDL_IntersectRect(&leftpaddle, &ball, &res)){
         		ballmoveleft =false;
         		score++;
+        		if((score % 5) == 0)
+        			PADDLE_SPEED++;
         		ss.str(""); // Clear the stringstream
-       			 ss.clear();
+       			ss.clear();
 			    ss << score;
 			    scoreStr = ss.str();
 			    text = TTF_RenderText_Solid( font, scoreStr.c_str(), color );
@@ -147,6 +153,8 @@ int main(int argc, char* argv[])
           if(SDL_IntersectRect(&rightpaddle, &ball, &res)){
         		ballmoveleft =true;
         		score++;
+        		if((score % 5) == 0)
+        			PADDLE_SPEED++;
         		ss.str(""); // Clear the stringstream
         		ss.clear();
 			    ss << score;
@@ -157,33 +165,36 @@ int main(int argc, char* argv[])
 
 
 
-        //Move paddle automatically
-        if(leftmoveup){
-        	
-	        if(leftpaddle.y == 0){
-	        	leftmoveup = false;
-	        }	
-	        else leftpaddle.y -= PADDLE_SPEED;
-	    }
-        if(!leftmoveup){
-        	if(leftpaddle.y >= 480 - leftpaddle.h){
-        		leftmoveup = true;
-        	}
-        	else leftpaddle.y += PADDLE_SPEED;
-        }
-        if(rightmoveup){
-        	
-	        if(rightpaddle.y == 0){
-	        	rightmoveup = false;
-	        }	
-	        else rightpaddle.y -= PADDLE_SPEED;
-	    }
-        if(!rightmoveup){
-        	if(rightpaddle.y >= 480 - rightpaddle.h){
-        		rightmoveup = true;
-        	}
-        	else rightpaddle.y += PADDLE_SPEED;
-        }
+      
+        	 if(leftmoveup){
+		        if(leftpaddle.y <= PADDLE_SPEED){
+		            leftmoveup = false;
+		        }else {
+		            leftpaddle.y -= PADDLE_SPEED;
+		        }
+		    }
+		    if(!leftmoveup){
+		        if(leftpaddle.y >= 480 - leftpaddle.h - PADDLE_SPEED){
+		            leftmoveup = true;
+		        }else {
+		            leftpaddle.y += PADDLE_SPEED;
+		        }
+		    }
+		    if(rightmoveup){
+		        if(rightpaddle.y <= PADDLE_SPEED){
+		            rightmoveup = false;
+		        }else {
+		            rightpaddle.y -= PADDLE_SPEED;
+		        }
+		    }
+		    if(!rightmoveup){
+		        if(rightpaddle.y >= 480 - rightpaddle.h - PADDLE_SPEED){
+		            rightmoveup = true;
+		        }else {
+		            rightpaddle.y += PADDLE_SPEED;
+		        }
+		    }
+
 
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
