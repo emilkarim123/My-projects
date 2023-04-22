@@ -86,6 +86,14 @@ int main(int argc, char* argv[])
         	}else ball.x += PADDLE_SPEED;
         	
         } 
+        SDL_Rect res;
+        if(SDL_IntersectRect(&leftpaddle, &ball, &res)){
+        		ballmoveleft =false;
+        }
+
+          if(SDL_IntersectRect(&rightpaddle, &ball, &res)){
+        		ballmoveleft =true;
+        }
 
 
 
