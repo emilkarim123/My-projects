@@ -17,6 +17,7 @@ void showStartScreen(SDL_Renderer* renderer, TTF_Font* font) {
     SDL_Rect textRect = {320 - textWidth / 2, 240 - textHeight / 2, textWidth, textHeight};
 
     bool startScreen = true;
+     bool gameOver = false;
     while (startScreen) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -42,7 +43,7 @@ void showStartScreen(SDL_Renderer* renderer, TTF_Font* font) {
 
 
 void gameOver(SDL_Renderer* renderer, TTF_Font* font) {
-	SDL_Color color = {196, 21, 18};
+    SDL_Color color = {196, 21, 18};
     SDL_Surface* gameOverSurface = TTF_RenderText_Solid(font, "WASTED", color);
     SDL_Texture* gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
 
@@ -52,25 +53,14 @@ void gameOver(SDL_Renderer* renderer, TTF_Font* font) {
 
     SDL_Rect textRect = {320 - textWidth / 2, 240 - textHeight / 2, textWidth, textHeight};
 
-    bool startScreen = true;
-    while (startScreen) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                startScreen = false;
-                exit(0);
-            }
-           
-        }
+    // Render "WASTED" text on top of the current screen
+    SDL_RenderCopy(renderer, gameOverTexture, NULL, &textRect);
+    SDL_RenderPresent(renderer);
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, gameOverTexture, NULL, &textRect);
-        SDL_RenderPresent(renderer);
-    }
+    // Slow down the game
+    SDL_Delay(2000); // Add a delay of 2 seconds (2000 milliseconds) to simulate slow motion
 
     SDL_DestroyTexture(gameOverTexture);
-
 
 
 }
@@ -161,6 +151,9 @@ int main(int argc, char* argv[])
 
     bool quit = false;
      showStartScreen(renderer, font);
+     bool gameOver = false;
+     SDL_Texture* gameOverTexture = NULL;
+      
     while (!quit) {
  		frameStart = SDL_GetTicks();
 
@@ -170,6 +163,12 @@ int main(int argc, char* argv[])
                 quit = true;
             }
     
+        }
+
+        if(gameOver) {
+            PADDLE_SPEED = 1;
+        } else {
+            PADDLE_SPEED = 5;
         }
 
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
@@ -265,8 +264,24 @@ int main(int argc, char* argv[])
 		        }
 		    }
 
-		    if(ball.x == 5 || ball.x == 625)
-		    	gameOver(renderer, font);
+		    if(ball.x == 5 || ball.x == 625){
+				  gameOver = true;
+				    if (!gameOverTexture) {
+				        SDL_Color color = {196, 21, 18};
+				        SDL_Surface* gameOverSurface = TTF_RenderText_Solid(font, "WASTED", color);
+				        gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
+
+				        int textWidth = gameOverSurface->w;
+				        int textHeight = gameOverSurface->h;
+				        SDL_FreeSurface(gameOverSurface);
+
+				        textRect.x = 320 - textWidth / 2;
+				        textRect.y = 240 - textHeight / 2;
+				        textRect.w = textWidth;
+				        textRect.h = textHeight;
+				    }
+		    }
+				//gameOver(renderer, font);
 
 
 
@@ -280,6 +295,10 @@ int main(int argc, char* argv[])
     SDL_RenderFillRect(renderer, &rightpaddle);
     SDL_RenderFillRect(renderer, &ball);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    if (gameOver) {
+            SDL_RenderCopy(renderer, gameOverTexture, NULL, &textRect);
+        }
+
     SDL_RenderPresent(renderer);
 
     frameTime = SDL_GetTicks() - frameStart;
